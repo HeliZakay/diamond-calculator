@@ -1,0 +1,20 @@
+.priceBox {
+  margin-top: 1rem;
+  padding: 1rem 1.25rem;
+  background: #f3f4f6;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.label {
+  color: #374151;
+}
+
+.value {
+  color: var(--accent);
+  font-weight: 700;
+}
