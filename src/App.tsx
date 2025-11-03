@@ -13,6 +13,7 @@ import { Button } from "./components/Button";
 import { calculatePriceWithBreakdown } from "./utils/calculatePriceWithBreakdown";
 import { PriceBreakdown } from "./components/PriceBreakdown";
 import { PriceBreakdownModal } from "./components/PriceBreakdownModal";
+import { DiamondViewer } from "./components/DiamondViewer";
 import "./App.css";
 
 function App() {
@@ -98,6 +99,55 @@ function App() {
               COLOR_FACTORS={COLOR_FACTORS}
               CLARITY_FACTORS={CLARITY_FACTORS}
             />
+
+            {/* Diamond viewer (shader-based), mapped from current selections */}
+            {(() => {
+              const colorScale: Color[] = ["D", "E", "F", "G", "H", "I", "J"]; // 7 steps
+              const colorIdx = Math.max(0, colorScale.indexOf(color));
+              const colorGrade = colorIdx / (colorScale.length - 1); // 0..1
+
+              const cutMap: Record<Cut, number> = {
+                Fair: 0.25,
+                Good: 0.5,
+                "Very Good": 0.75,
+                Excellent: 1,
+              };
+              const cutNorm = cutMap[cut];
+
+              const clarityScale: Clarity[] = [
+                "I1",
+                "SI2",
+                "SI1",
+                "VS2",
+                "VS1",
+                "VVS2",
+                "VVS1",
+                "IF",
+                "FL",
+              ];
+              const clIdx = Math.max(0, clarityScale.indexOf(clarity));
+              const clarityNorm = clIdx / (clarityScale.length - 1); // 0..1 (I1->FL)
+
+              return (
+                <div
+                  style={{
+                    margin: "0.5rem 0 0.75rem",
+                    borderRadius: 12,
+                    overflow: "hidden",
+                    boxShadow: "0 10px 24px rgba(0,0,0,0.18)",
+                  }}
+                >
+                  <DiamondViewer
+                    key={`${color}-${cut}-${clarity}`}
+                    colorGrade={colorGrade}
+                    cut={cutNorm}
+                    clarity={clarityNorm}
+                    texturePath={`${import.meta.env.BASE_URL}diamond.png`}
+                    style={{ width: "100%", height: 260 }}
+                  />
+                </div>
+              );
+            })()}
 
             <PriceBox
               price={final}
