@@ -22,7 +22,7 @@ const PriceBreakdownModalLazy = lazy(() =>
     default: m.PriceBreakdownModal,
   }))
 );
-const DiamondViewerLazy = lazy(() => import("./components/DiamondViewer"));
+import DiamondViewer from "./components/DiamondViewer";
 import { SparkleCursor } from "./components/SparkleCursor";
 import { useIsDesktop } from "./hooks/useIsDesktop";
 import {
@@ -40,9 +40,6 @@ function App() {
   const [showModal, setShowModal] = useState(false);
   const [showBreakdown, setShowBreakdown] = useState(false);
   const isDesktop = useIsDesktop();
-  // Centering is handled purely with CSS to avoid layout shifts and overflow
-
-  // Responsive breakpoint handled by useIsDesktop hook
 
   // Compute derived values with memoization to avoid unnecessary recalcs
   const { final, parts } = useMemo(() => {
@@ -100,26 +97,13 @@ function App() {
                     boxShadow: "0 10px 24px rgba(0,0,0,0.18)",
                   }}
                 >
-                  <Suspense
-                    fallback={
-                      <div
-                        style={{
-                          width: "100%",
-                          height: 260,
-                          background: "#eceff3",
-                        }}
-                      />
-                    }
-                  >
-                    <DiamondViewerLazy
-                      key={`${color}-${cut}-${clarity}`}
-                      colorGrade={colorGrade}
-                      cut={cutNorm}
-                      clarity={clarityNorm}
-                      texturePath={`${import.meta.env.BASE_URL}diamond.png`}
-                      style={{ width: "100%", height: 260 }}
-                    />
-                  </Suspense>
+                  <DiamondViewer
+                    colorGrade={colorGrade}
+                    cut={cutNorm}
+                    clarity={clarityNorm}
+                    texturePath={`${import.meta.env.BASE_URL}diamond.png`}
+                    style={{ width: "100%", height: 260 }}
+                  />
                 </div>
               );
             })()}

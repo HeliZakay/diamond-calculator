@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useMemo, useRef } from "react";
+import React, { Suspense, useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import { OrthographicCamera } from "@react-three/drei";
@@ -290,13 +290,19 @@ export function DiamondViewer({
         {/* Ortho camera that auto-fits the 2x2 quad */}
         <OrthographicCamera makeDefault position={[0, 0, 5]} />
         <OrthoAutoZoom />
-        {/* Diamond */}
-        <DiamondQuad
-          colorGrade={THREE.MathUtils.clamp(colorGrade, 0, 1)}
-          cut={THREE.MathUtils.clamp(cut, 0, 1)}
-          clarity={THREE.MathUtils.clamp(clarity, 0, 1)}
-          texturePath={texturePath}
-        />
+        {/*
+          Wrap content that uses useLoader with Suspense so the Canvas stays
+          mounted while textures load. This avoids the initial show-then-hide
+          flicker when the loader suspends.
+        */}
+        <Suspense fallback={null}>
+          <DiamondQuad
+            colorGrade={THREE.MathUtils.clamp(colorGrade, 0, 1)}
+            cut={THREE.MathUtils.clamp(cut, 0, 1)}
+            clarity={THREE.MathUtils.clamp(clarity, 0, 1)}
+            texturePath={texturePath}
+          />
+        </Suspense>
       </Canvas>
     </div>
   );
