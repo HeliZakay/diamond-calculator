@@ -1,5 +1,4 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-// import { calculateDiamondPrice } from "./utils/calculateDiamondPrice";
 import { findSimilarDiamonds } from "./utils/findSimilarDiamonds";
 import {
   CUT_FACTORS,
@@ -98,24 +97,6 @@ function App() {
               CUT_FACTORS={CUT_FACTORS}
               COLOR_FACTORS={COLOR_FACTORS}
               CLARITY_FACTORS={CLARITY_FACTORS}
-            />
-            <img
-              src={`${import.meta.env.BASE_URL}diamond-demo.png`}
-              alt="Diamond demo"
-              className="card__image"
-              loading="lazy"
-              data-alt="0"
-              onError={(e) => {
-                const img = e.currentTarget as HTMLImageElement & { dataset: DOMStringMap };
-                const step = img.dataset.alt ?? "0";
-                if (step === "0") {
-                  img.src = `${import.meta.env.BASE_URL}diamond-demo.jpg`;
-                  img.dataset.alt = "1";
-                } else if (step === "1") {
-                  img.src = `${import.meta.env.BASE_URL}diam5.png`;
-                  img.dataset.alt = "2";
-                }
-              }}
             />
 
             <PriceBox
