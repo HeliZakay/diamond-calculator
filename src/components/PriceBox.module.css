@@ -18,3 +18,31 @@
   color: var(--accent);
   font-weight: 700;
 }
+
+/* Desktop-only affordance when the price is clickable */
+.clickable {
+  cursor: pointer;
+}
+
+@media (min-width: 880px) {
+  /* Make it look like a pill button by default */
+  .clickable {
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+    box-shadow: none; /* remove border */
+    background: #e9edf3; /* slightly darker than card background */
+  }
+
+  .clickable:hover {
+    background: #e3e8f0; /* subtle hint without border */
+  }
+
+  .clickable:active {
+    transform: translateY(1px);
+  }
+
+  .clickable:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}

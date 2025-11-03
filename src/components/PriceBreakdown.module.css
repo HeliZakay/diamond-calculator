@@ -1,0 +1,70 @@
+.wrapper {
+  margin-top: 0.5rem;
+}
+.toggle {
+  background: transparent;
+  color: var(--accent);
+  border: none;
+  padding: 0;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (min-width: 880px) {
+  .toggle {
+    display: none;
+  }
+}
+.panel {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  color: #111;
+  overflow: hidden;
+  /* keep horizontal padding to avoid width jump */
+  padding: 0 1rem;
+  /* collapsed state */
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  border-width: 0;
+  transition: max-height 280ms ease, opacity 180ms ease, transform 280ms ease,
+    padding-top 180ms ease, padding-bottom 180ms ease, border-width 180ms ease,
+    margin-top 180ms ease;
+}
+
+.open {
+  max-height: 500px; /* comfortably larger than content */
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-width: 1px;
+  margin-top: 0.5rem;
+}
+
+.row,
+.rowTotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.35rem 0;
+  font-size: 0.92rem;
+}
+.rowTotal {
+  font-size: 1rem;
+  font-weight: 700;
+}
+.hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 0.5rem 0;
+}
+
+/* Provide bottom spacing like the grid in SimilarDiamondsModal */
+.content {
+  margin-bottom: 1.25rem;
+  color: #0f172a; /* dark text on white modal background */
+}
