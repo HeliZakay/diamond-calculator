@@ -61,6 +61,11 @@ const frag = /* glsl */ `
     return fract(p.x * p.y);
   }
 
+  // Small static blue noise for subtle dithering
+  float blueNoise(vec2 uv){
+    return fract(sin(dot(uv * uResolution.xy, vec2(12.9898,78.233))) * 43758.5453);
+  }
+
   void main() {
     // Base sample
     vec4 base = texture2D(uTex, vUv);
@@ -72,13 +77,12 @@ const frag = /* glsl */ `
 
     vec3 color = base.rgb;
 
-  // 1) Color Grade → yellow tint (slightly stronger for visibility)
-  //    Map 0..1 to tint amount 0..~0.5
-  float tintAmt = smoothstep(0.0, 1.0, uColorGrade) * 0.5;
+  // 1) Color Grade → yellow tint (more nuanced, lower max)
+  float tintAmt = smoothstep(0.0, 1.0, uColorGrade) * 0.35;
     vec3 yellow = vec3(1.0, 0.94, 0.55);
     color = mix(color, color * yellow, tintAmt);
 
-    // 2) Cut → contrast and edge highlights via Sobel
+    // 2) Cut → contrast, edge highlights via Sobel + dispersion along gradient
     //    Compute Sobel gradient on luminance from surrounding texels
     float c00 = luma(texture2D(uTex, vUv + vec2(-uTexel.x, -uTexel.y)).rgb);
     float c10 = luma(texture2D(uTex, vUv + vec2( 0.0,       -uTexel.y)).rgb);
@@ -92,14 +96,24 @@ const frag = /* glsl */ `
 
     float gx = -c00 - 2.0*c10 - c20 + c02 + 2.0*c12 + c22;
     float gy = -c00 - 2.0*c01 - c02 + c20 + 2.0*c21 + c22;
-    float edge = clamp(length(vec2(gx, gy)), 0.0, 1.0);
+    vec2 grad = vec2(gx, gy);
+    float edge = clamp(length(grad), 0.0, 1.0);
+    vec2 dir = normalize(grad + 1e-5);
 
     // Edge boost scales with cut (ideal → more crisp edges)
-    float edgeBoost = uCut * 0.9;
+    float edgeBoost = uCut * 0.75;
     color += edge * edgeBoost;
 
-    // Contrast curve from cut (slightly stronger)
-    float contrast = 1.0 + uCut * 1.0;
+    // Subtle chromatic dispersion along edge direction
+    float disp = 0.75 * uCut * (0.5 + 0.5*edge) * max(0.0, 1.0 - tintAmt) * 0.003;
+    vec3 dispersed;
+    dispersed.r = texture2D(uTex, vUv + dir * disp).r;
+    dispersed.g = texture2D(uTex, vUv).g;
+    dispersed.b = texture2D(uTex, vUv - dir * disp).b;
+    color = mix(color, dispersed, smoothstep(0.1, 0.9, edge) * 0.6 * uCut);
+
+    // Contrast curve from cut (slightly filmic curve)
+    float contrast = 1.0 + uCut * 0.8;
     color = clamp(0.5 + (color - 0.5) * contrast, 0.0, 1.0);
 
     // 3) Clarity → haze + inclusions (more when clarity is low)
@@ -108,13 +122,17 @@ const frag = /* glsl */ `
     // Haze: radial gradient from center
     vec2 center = vec2(0.5);
     float d = distance(vUv, center) / 0.5; // 0 at center, 1 at edge
-    float haze = clarityLack * smoothstep(0.12, 0.95, d) * 0.5; // stronger
-    color = mix(color, vec3(1.0), haze * 0.35);
+    float haze = clarityLack * smoothstep(0.15, 0.95, d) * 0.35;
+    color = mix(color, vec3(1.0), haze * 0.28);
+
+    // Fresnel-like rim to add brilliance on outline
+    float fres = pow(smoothstep(0.2, 1.0, d), 1.5);
+    color += fres * edge * (0.15 + 0.25*uCut);
 
     // Inclusions: soft dots inside diamond area (efficient, no loops)
     float circleMask = step(d, 1.0);
     // Cell-based random position
-    float density = mix(60.0, 300.0, clarityLack); // reduce density to emphasize dot size
+    float density = mix(24.0, 140.0, clarityLack); // fewer, subtler
     vec2 cell = floor(vUv * density);
     vec2 cellUv = fract(vUv * density) - 0.5;
     // Random center per cell, slightly animated
@@ -125,13 +143,28 @@ const frag = /* glsl */ `
       cos(uTime * 1.1 + h2 * 6.2831)
     );
     float distTo = length(cellUv - centerOff);
-    float dotRad = mix(0.008, 0.02, clarityLack); // size grows when clarity is worse
+    float dotRad = mix(0.006, 0.016, clarityLack);
     float inkl = smoothstep(dotRad, dotRad * 0.6, distTo);
     // Gate appearance probability per cell by another hash
-    float appear = step(mix(0.98, 0.85, clarityLack), hash(cell + 91.7));
+    float appear = step(mix(0.995, 0.88, clarityLack), hash(cell + 91.7));
     float speck = (1.0 - inkl) * appear * circleMask * smoothstep(1.0, 0.15, d);
-    // Apply as dark inclusion
-    color *= (1.0 - speck * (0.25 + 0.35 * clarityLack));
+    // Apply as dark inclusion (slightly weaker)
+    color *= (1.0 - speck * (0.18 + 0.25 * clarityLack));
+
+    // Procedural micro-glints: angular streaks rotating slowly
+    vec2 p = vUv - 0.5;
+    float ang = atan(p.y, p.x) + uTime * 0.35;
+    float star1 = pow(max(0.0, cos(6.0*ang)), 24.0) * smoothstep(0.5, 0.02, length(p));
+    float star2 = pow(max(0.0, cos(8.0*(ang + 1.57))), 22.0) * smoothstep(0.5, 0.02, length(p));
+    float glint = (star1 + star2) * 0.12 * uCut;
+    color += glint;
+
+    // Subtle vignette to focus the eye
+    float vign = smoothstep(0.95, 0.4, d);
+    color *= mix(0.95, 1.0, vign);
+
+    // Tiny blue noise dithering to avoid banding
+    color += (blueNoise(vUv*1.7) - 0.5) * 0.003;
 
     gl_FragColor = vec4(color, base.a);
   }
@@ -185,13 +218,20 @@ function DiamondQuad(props: {
     }
   }, [texture]);
 
+  // Smoothly approach target props to avoid abrupt jumps
+  const smooth = useRef({ cg: 0, ct: 0, cl: 0 });
+
   useFrame((state) => {
     if (!matRef.current) return;
     matRef.current.uniforms.uTime.value = state.clock.getElapsedTime();
-    // Update dynamic uniforms
-    matRef.current.uniforms.uColorGrade.value = props.colorGrade;
-    matRef.current.uniforms.uCut.value = props.cut;
-    matRef.current.uniforms.uClarity.value = props.clarity;
+    // Update dynamic uniforms with damping
+    const damp = 0.08; // smoothing factor
+    smooth.current.cg += (props.colorGrade - smooth.current.cg) * damp;
+    smooth.current.ct += (props.cut - smooth.current.ct) * damp;
+    smooth.current.cl += (props.clarity - smooth.current.cl) * damp;
+    matRef.current.uniforms.uColorGrade.value = smooth.current.cg;
+    matRef.current.uniforms.uCut.value = smooth.current.ct;
+    matRef.current.uniforms.uClarity.value = smooth.current.cl;
     matRef.current.uniforms.uResolution.value.set(
       state.size.width,
       state.size.height
