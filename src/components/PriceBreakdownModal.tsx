@@ -1,5 +1,6 @@
 import { Modal } from "./Modal";
 import breakdownStyles from "./PriceBreakdown.module.css";
+import { formatCurrency } from "../utils/formatCurrency";
 import { Button } from "./Button";
 import type { PriceParts } from "../utils/calculatePriceWithBreakdown";
 
@@ -23,11 +24,11 @@ export function PriceBreakdownModal({ open, onClose, parts, final }: Props) {
       <div className={breakdownStyles.content}>
         <div className={breakdownStyles.row}>
           <span>Base per carat</span>
-          <strong>${basePerCarat.toLocaleString()}</strong>
+          <strong>{formatCurrency(basePerCarat)}</strong>
         </div>
         <div className={breakdownStyles.row}>
           <span>Base (carat × $/ct)</span>
-          <strong>${base.toLocaleString()}</strong>
+          <strong>{formatCurrency(base)}</strong>
         </div>
         <div className={breakdownStyles.row}>
           <span>Cut factor</span>
@@ -46,7 +47,7 @@ export function PriceBreakdownModal({ open, onClose, parts, final }: Props) {
 
         <div className={breakdownStyles.rowTotal}>
           <span>Final</span>
-          <strong>${final.toLocaleString()}</strong>
+          <strong>{formatCurrency(final)}</strong>
         </div>
       </div>
 

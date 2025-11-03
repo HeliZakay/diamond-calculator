@@ -10,6 +10,7 @@ import styles from "./SparkleCursor.module.css";
 export function SparkleCursor() {
   const layerRef = useRef<HTMLDivElement>(null);
   const lastSpawnRef = useRef<number>(0);
+  const lastClickRef = useRef<number>(0);
   const reduceMotion = useRef<boolean>(false);
 
   useEffect(() => {
@@ -68,6 +69,10 @@ export function SparkleCursor() {
     };
 
     const onClick = (e: MouseEvent) => {
+      const now = performance.now();
+      const COOLDOWN = 320; // ms; ignore ultra-fast repeated clicks
+      if (now - lastClickRef.current < COOLDOWN) return;
+      lastClickRef.current = now;
       spawn(e.clientX, e.clientY, 14);
     };
 

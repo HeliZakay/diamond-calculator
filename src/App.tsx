@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState, lazy, Suspense } from "react";
 import { findSimilarDiamonds } from "./utils/findSimilarDiamonds";
 import {
   CUT_FACTORS,
@@ -8,13 +8,28 @@ import {
 import type { Cut, Color, Clarity, Diamond } from "./types";
 import { DiamondForm } from "./components/DiamondForm";
 import { PriceBox } from "./components/PriceBox";
-import { SimilarDiamondsModal } from "./components/SimilarDiamondsModal";
+// Lazy load heavy/secondary UI to reduce initial bundle
+const SimilarDiamondsModalLazy = lazy(() =>
+  import("./components/SimilarDiamondsModal").then((m) => ({
+    default: m.SimilarDiamondsModal,
+  }))
+);
 import { Button } from "./components/Button";
 import { calculatePriceWithBreakdown } from "./utils/calculatePriceWithBreakdown";
 import { PriceBreakdown } from "./components/PriceBreakdown";
-import { PriceBreakdownModal } from "./components/PriceBreakdownModal";
-import { DiamondViewer } from "./components/DiamondViewer";
+const PriceBreakdownModalLazy = lazy(() =>
+  import("./components/PriceBreakdownModal").then((m) => ({
+    default: m.PriceBreakdownModal,
+  }))
+);
+const DiamondViewerLazy = lazy(() => import("./components/DiamondViewer"));
 import { SparkleCursor } from "./components/SparkleCursor";
+import { useIsDesktop } from "./hooks/useIsDesktop";
+import {
+  normalizeColor,
+  normalizeCut,
+  normalizeClarity,
+} from "./utils/normalizeDiamondParams";
 import "./App.css";
 
 function App() {
@@ -24,29 +39,18 @@ function App() {
   const [clarity, setClarity] = useState<Clarity>("FL");
   const [showModal, setShowModal] = useState(false);
   const [showBreakdown, setShowBreakdown] = useState(false);
-  const [isDesktop, setIsDesktop] = useState<boolean>(false);
+  const isDesktop = useIsDesktop();
   // Centering is handled purely with CSS to avoid layout shifts and overflow
 
-  useEffect(() => {
-    const onResize = () => setIsDesktop(window.innerWidth >= 880);
-    onResize();
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
+  // Responsive breakpoint handled by useIsDesktop hook
 
-  //const price = calculateDiamondPrice({ carat, cut, color, clarity });
-  const { final, parts } = calculatePriceWithBreakdown({
-    carat,
-    cut,
-    color,
-    clarity,
-  });
-  const similar: Diamond[] = findSimilarDiamonds({
-    carat,
-    cut,
-    color,
-    clarity,
-  });
+  // Compute derived values with memoization to avoid unnecessary recalcs
+  const { final, parts } = useMemo(() => {
+    return calculatePriceWithBreakdown({ carat, cut, color, clarity });
+  }, [carat, cut, color, clarity]);
+  const similar: Diamond[] = useMemo(() => {
+    return findSimilarDiamonds({ carat, cut, color, clarity });
+  }, [carat, cut, color, clarity]);
 
   return (
     <div className="page">
@@ -83,31 +87,9 @@ function App() {
 
             {/* Diamond viewer (shader-based), mapped from current selections */}
             {(() => {
-              const colorScale: Color[] = ["D", "E", "F", "G", "H", "I", "J"]; // 7 steps
-              const colorIdx = Math.max(0, colorScale.indexOf(color));
-              const colorGrade = colorIdx / (colorScale.length - 1); // 0..1
-
-              const cutMap: Record<Cut, number> = {
-                Fair: 0.25,
-                Good: 0.5,
-                "Very Good": 0.75,
-                Excellent: 1,
-              };
-              const cutNorm = cutMap[cut];
-
-              const clarityScale: Clarity[] = [
-                "I1",
-                "SI2",
-                "SI1",
-                "VS2",
-                "VS1",
-                "VVS2",
-                "VVS1",
-                "IF",
-                "FL",
-              ];
-              const clIdx = Math.max(0, clarityScale.indexOf(clarity));
-              const clarityNorm = clIdx / (clarityScale.length - 1); // 0..1 (I1->FL)
+              const colorGrade = normalizeColor(color);
+              const cutNorm = normalizeCut(cut);
+              const clarityNorm = normalizeClarity(clarity);
 
               return (
                 <div
@@ -118,28 +100,43 @@ function App() {
                     boxShadow: "0 10px 24px rgba(0,0,0,0.18)",
                   }}
                 >
-                  <DiamondViewer
-                    key={`${color}-${cut}-${clarity}`}
-                    colorGrade={colorGrade}
-                    cut={cutNorm}
-                    clarity={clarityNorm}
-                    texturePath={`${import.meta.env.BASE_URL}diamond.png`}
-                    style={{ width: "100%", height: 260 }}
-                  />
+                  <Suspense
+                    fallback={
+                      <div
+                        style={{
+                          width: "100%",
+                          height: 260,
+                          background: "#eceff3",
+                        }}
+                      />
+                    }
+                  >
+                    <DiamondViewerLazy
+                      key={`${color}-${cut}-${clarity}`}
+                      colorGrade={colorGrade}
+                      cut={cutNorm}
+                      clarity={clarityNorm}
+                      texturePath={`${import.meta.env.BASE_URL}diamond.png`}
+                      style={{ width: "100%", height: 260 }}
+                    />
+                  </Suspense>
                 </div>
               );
             })()}
 
             <PriceBox
               price={final}
-              clickable={isDesktop}
-              onClick={isDesktop ? () => setShowBreakdown(true) : undefined}
+              clickable={true}
+              onClick={() => setShowBreakdown(true)}
             />
-            <PriceBreakdown
-              parts={parts}
-              final={final}
-              onOpen={() => setShowBreakdown(true)}
-            />
+            {isDesktop && (
+              <PriceBreakdown
+                parts={parts}
+                final={final}
+                onOpen={() => setShowBreakdown(true)}
+                expanded={showBreakdown}
+              />
+            )}
             <div className="card__actions">
               <Button onClick={() => setShowModal(true)}>
                 Show Similar Diamonds
@@ -149,18 +146,22 @@ function App() {
         </div>
       </header>
 
-      <SimilarDiamondsModal
-        open={showModal}
-        onClose={() => setShowModal(false)}
-        diamonds={similar}
-      />
+      <Suspense fallback={null}>
+        <SimilarDiamondsModalLazy
+          open={showModal}
+          onClose={() => setShowModal(false)}
+          diamonds={similar}
+        />
+      </Suspense>
 
-      <PriceBreakdownModal
-        open={showBreakdown}
-        onClose={() => setShowBreakdown(false)}
-        parts={parts}
-        final={final}
-      />
+      <Suspense fallback={null}>
+        <PriceBreakdownModalLazy
+          open={showBreakdown}
+          onClose={() => setShowBreakdown(false)}
+          parts={parts}
+          final={final}
+        />
+      </Suspense>
     </div>
   );
 }

@@ -10,12 +10,15 @@
   font-weight: 600;
 }
 
-/* Make the whole box interactive when clickable is enabled */
+/* Legacy helper; container is no longer clickable, but keep for safety */
 .priceBoxInteractive {
   cursor: pointer;
 }
 
 .label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   color: #374151;
 }
 
@@ -24,30 +27,32 @@
   font-weight: 700;
 }
 
-/* Desktop-only affordance when the price is clickable */
 .clickable {
   cursor: pointer;
 }
 
-@media (min-width: 880px) {
-  /* Make it look like a pill button by default */
-  .clickable {
-    padding: 0.25rem 0.5rem;
-    border-radius: 8px;
-    box-shadow: none; /* remove border */
-    background: #e9edf3; /* slightly darker than card background */
-  }
+/* Minimal, unstyled icon button for the info icon */
+.infoButton {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 999px;
+}
+.infoButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 
-  .clickable:hover {
-    background: #e3e8f0; /* subtle hint without border */
-  }
-
-  .clickable:active {
-    transform: translateY(1px);
-  }
-
-  .clickable:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
+/* Non-interactive icon wrapper (for when clickable is false) */
+.infoIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }

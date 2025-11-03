@@ -145,3 +145,10 @@ button {
     max-width: 420px;
   }
 }
+
+/* Narrow screens: center the subtitle block */
+@media (max-width: 860px) {
+  .subtitle {
+    margin: 0 auto;
+  }
+}

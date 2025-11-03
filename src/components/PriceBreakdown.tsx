@@ -1,10 +1,15 @@
 import styles from "./PriceBreakdown.module.css";
 import type { PriceParts } from "../utils/calculatePriceWithBreakdown";
 
-type Props = { parts: PriceParts; final: number; onOpen: () => void };
+type Props = {
+  parts: PriceParts;
+  final: number;
+  onOpen: () => void;
+  expanded?: boolean;
+};
 
 export function PriceBreakdown(props: Props) {
-  const { onOpen } = props;
+  const { onOpen, expanded } = props;
   return (
     <div className={styles.wrapper}>
       <button
@@ -12,7 +17,7 @@ export function PriceBreakdown(props: Props) {
         className={styles.toggle}
         onClick={onOpen}
         aria-haspopup="dialog"
-        aria-expanded={false}
+        aria-expanded={expanded ?? false}
       >
         Show breakdown
       </button>

@@ -1,4 +1,5 @@
 import { calculateDiamondPrice } from "../utils/calculateDiamondPrice";
+import { formatCurrency } from "../utils/formatCurrency";
 import { MOCK_DIAMONDS } from "../data/mockDiamonds";
 import { Button } from "./Button";
 import type { Diamond } from "../types";
@@ -33,7 +34,11 @@ export function SimilarDiamondsModal({ open, onClose, diamonds }: Props) {
       <div className={styles.grid}>
         {listToRender.map((d) => (
           <div key={d.id} className={styles.card}>
-            <img src={d.img} alt="diamond" className={styles.image} />
+            <img
+              src={d.img}
+              alt={`${d.carat} ct ${d.cut} diamond, color ${d.color}, clarity ${d.clarity}`}
+              className={styles.image}
+            />
             <p className={styles.text}>
               {d.carat} ct • {d.cut}
             </p>
@@ -41,7 +46,7 @@ export function SimilarDiamondsModal({ open, onClose, diamonds }: Props) {
               Color {d.color} • Clarity {d.clarity}
             </p>
             <strong className={styles.price}>
-              ${calculateDiamondPrice(d).toLocaleString()}
+              {formatCurrency(calculateDiamondPrice(d))}
             </strong>
           </div>
         ))}

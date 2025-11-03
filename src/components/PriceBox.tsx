@@ -1,4 +1,6 @@
 import styles from "./PriceBox.module.css";
+import { FaInfoCircle } from "react-icons/fa";
+import { formatCurrency } from "../utils/formatCurrency";
 
 type PriceBoxProps = {
   price: number;
@@ -7,27 +9,27 @@ type PriceBoxProps = {
 };
 
 export function PriceBox({ price, clickable, onClick }: PriceBoxProps) {
-  const handleKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (!clickable) return;
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      onClick?.();
-    }
-  };
   return (
-    <div
-      className={`${styles.priceBox} ${
-        clickable ? styles.priceBoxInteractive : ""
-      }`}
-      onClick={clickable ? onClick : undefined}
-      role={clickable ? "button" : undefined}
-      tabIndex={clickable ? 0 : undefined}
-      aria-label={clickable ? "Show price breakdown" : undefined}
-      onKeyDown={handleKey}
-    >
-      <span className={styles.label}>Final Price</span>
-      <span className={`${styles.value} ${clickable ? styles.clickable : ""}`}>
-        ${price.toLocaleString()}
+    <div className={styles.priceBox}>
+      <span className={styles.label}>
+        {clickable ? (
+          <button
+            type="button"
+            className={styles.infoButton}
+            aria-label="Show price breakdown"
+            onClick={onClick}
+          >
+            <FaInfoCircle size={20} color="rgba(14, 164, 233, 1)" />
+          </button>
+        ) : (
+          <span className={styles.infoIcon} aria-hidden>
+            <FaInfoCircle size={20} color="rgba(14, 164, 233, 1)" />
+          </span>
+        )}
+        Final Price
+      </span>
+      <span className={styles.value} aria-live="polite">
+        {formatCurrency(price)}
       </span>
     </div>
   );
