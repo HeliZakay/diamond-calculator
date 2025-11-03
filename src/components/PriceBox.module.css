@@ -10,6 +10,11 @@
   font-weight: 600;
 }
 
+/* Make the whole box interactive when clickable is enabled */
+.priceBoxInteractive {
+  cursor: pointer;
+}
+
 .label {
   color: #374151;
 }
