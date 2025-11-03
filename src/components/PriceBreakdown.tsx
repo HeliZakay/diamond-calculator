@@ -3,11 +3,8 @@ import type { PriceParts } from "../utils/calculatePriceWithBreakdown";
 
 type Props = { parts: PriceParts; final: number; onOpen: () => void };
 
-export function PriceBreakdown({
-  parts: _parts,
-  final: _final,
-  onOpen,
-}: Props) {
+export function PriceBreakdown(props: Props) {
+  const { onOpen } = props;
   return (
     <div className={styles.wrapper}>
       <button
