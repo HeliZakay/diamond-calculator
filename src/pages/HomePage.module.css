@@ -1,0 +1,15 @@
+/* --- Base layout --- */
+.page:root,
+:root {
+  /* Global accent tokens */
+  --accent: #0ea5e9; /* icy cyan */
+  --accent-hover: #0284c7;
+}
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  background: #0f172a;
+  color: #f8fafc;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+}

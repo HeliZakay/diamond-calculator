@@ -1,5 +1,5 @@
 // ----------------------------------------------------
-// ✨ Core diamond types
+// Core diamond types
 // ----------------------------------------------------
 
 // Cut grade categories (based on GIA standard)
@@ -21,7 +21,7 @@ export type Clarity =
   | "I1";
 
 // ----------------------------------------------------
-// 💎 Object structures
+// Object structures
 // ----------------------------------------------------
 
 // Basic diamond input for price calculation
@@ -39,7 +39,7 @@ export interface Diamond extends DiamondInput {
 }
 
 // ----------------------------------------------------
-// ⚙️ Optional helper type
+//  Optional helper type
 // ----------------------------------------------------
 
 // A type representing all factor tables (cut, color, clarity)
@@ -48,3 +48,11 @@ export interface Factors {
   color: Record<Color, number>;
   clarity: Record<Clarity, number>;
 }
+
+export type PriceParts = {
+  basePerCarat: number;
+  base: number;
+  cutFactor: number;
+  colorFactor: number;
+  clarityFactor: number;
+};

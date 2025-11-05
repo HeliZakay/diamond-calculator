@@ -1,34 +1,18 @@
 import { useEffect, useState } from "react";
 import type { Cut, Color, Clarity } from "../types";
-import styles from "./DiamondForm.module.css";
-
-type Props = {
-  carat: number;
-  cut: Cut;
-  color: Color;
-  clarity: Clarity;
-  onCaratChange: (v: number) => void;
-  onCutChange: (v: Cut) => void;
-  onColorChange: (v: Color) => void;
-  onClarityChange: (v: Clarity) => void;
-  CUT_FACTORS: Record<Cut, number>;
-  COLOR_FACTORS: Record<Color, number>;
-  CLARITY_FACTORS: Record<Clarity, number>;
-};
-
-export function DiamondForm({
-  carat,
-  cut,
-  color,
-  clarity,
-  onCaratChange,
-  onCutChange,
-  onColorChange,
-  onClarityChange,
+import {
   CUT_FACTORS,
   COLOR_FACTORS,
   CLARITY_FACTORS,
-}: Props) {
+} from "../constants/diamondFactors";
+import styles from "./DiamondForm.module.css";
+import { useDiamondCalcContext } from "../ contexts/DiamondCalcContext";
+
+export function DiamondForm({}) {
+  const ctx = useDiamondCalcContext();
+
+  const { carat, cut, color, clarity, setCarat, setClarity, setColor, setCut } =
+    ctx;
   const MAX_CHARS = 5; // limit input to 5 characters (including decimal point)
   // Local input state to avoid forced leading zeros (e.g., "02") and allow empty typing
   const [caratStr, setCaratStr] = useState<string>(String(carat));
@@ -64,14 +48,14 @@ export function DiamondForm({
     setCaratStr(next);
     // If the field is empty, reflect price as 0 immediately
     if (next === "") {
-      onCaratChange(0);
+      setCarat(0);
       return;
     }
     // Update parent only when we have a "solid" numeric value (not empty or just ".")
     if (next !== "" && next !== ".") {
       const num = Number(next);
       if (!Number.isNaN(num)) {
-        onCaratChange(num);
+        setCarat(num);
       }
     }
   };
@@ -79,14 +63,14 @@ export function DiamondForm({
   const onCaratInputBlur = () => {
     if (caratStr === "") {
       // If left empty, default to 0 per UX requirement
-      onCaratChange(0);
+      setCarat(0);
       setCaratStr("0");
       return;
     }
     // Ensure the parent gets the final parsed value (e.g., if user leaves a trailing dot)
     const parsed = Number(caratStr);
     if (!Number.isNaN(parsed)) {
-      onCaratChange(parsed);
+      setCarat(parsed);
       setCaratStr(String(parsed).slice(0, MAX_CHARS));
     }
   };
@@ -117,7 +101,7 @@ export function DiamondForm({
         <span className={styles.label}>Cut</span>
         <select
           value={cut}
-          onChange={(e) => onCutChange(e.target.value as Cut)}
+          onChange={(e) => setCut(e.target.value as Cut)}
           className={styles.input}
         >
           {(Object.keys(CUT_FACTORS) as Cut[]).map((c) => (
@@ -133,7 +117,7 @@ export function DiamondForm({
         <span className={styles.label}>Color</span>
         <select
           value={color}
-          onChange={(e) => onColorChange(e.target.value as Color)}
+          onChange={(e) => setColor(e.target.value as Color)}
           className={styles.input}
         >
           {(Object.keys(COLOR_FACTORS) as Color[]).map((c) => (
@@ -149,7 +133,7 @@ export function DiamondForm({
         <span className={styles.label}>Clarity</span>
         <select
           value={clarity}
-          onChange={(e) => onClarityChange(e.target.value as Clarity)}
+          onChange={(e) => setClarity(e.target.value as Clarity)}
           className={styles.input}
         >
           {(Object.keys(CLARITY_FACTORS) as Clarity[]).map((c) => (

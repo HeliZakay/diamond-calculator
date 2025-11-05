@@ -1,7 +1,7 @@
 import { Modal } from "./Modal";
-import breakdownStyles from "./PriceBreakdown.module.css";
+import breakdownStyles from "./PriceBreakdownModal.module.css";
 import { formatCurrency } from "../utils/formatCurrency";
-import { Button } from "./Button";
+import { Button } from "@/ui/Button";
 import type { PriceParts } from "../utils/calculatePriceWithBreakdown";
 
 type Props = {
@@ -11,7 +11,12 @@ type Props = {
   final: number;
 };
 
-export function PriceBreakdownModal({ open, onClose, parts, final }: Props) {
+export default function PriceBreakdownModal({
+  open,
+  onClose,
+  parts,
+  final,
+}: Props) {
   const { basePerCarat, base, cutFactor, colorFactor, clarityFactor } = parts;
 
   return (
