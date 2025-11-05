@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import type { Cut, Color, Clarity } from "../types";
+import type { Cut, Color, Clarity } from "../..//types";
 import {
   CUT_FACTORS,
   COLOR_FACTORS,
   CLARITY_FACTORS,
-} from "../constants/diamondFactors";
+} from "@/features/diamond-calculator/constants/diamondFactors";
 import styles from "./DiamondForm.module.css";
-import { useDiamondCalcContext } from "../ contexts/DiamondCalcContext";
+import { useDiamondCalcContext } from "@/features/diamond-calculator/contexts/DiamondCalcContext";
 
 export function DiamondForm({}) {
   const ctx = useDiamondCalcContext();

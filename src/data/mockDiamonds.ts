@@ -1,4 +1,4 @@
-import type { Diamond } from "../types";
+import type { Diamond } from "./types";
 
 export const MOCK_DIAMONDS: Diamond[] = [
   {

@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, useMemo } from "react";
-import type { Cut, Color, Clarity } from "../types";
+import type { Cut, Color, Clarity } from "@/features/diamond-calculator/types";
 
 type DiamondCalcContextValue = {
   carat: number;

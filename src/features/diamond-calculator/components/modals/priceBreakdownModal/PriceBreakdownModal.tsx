@@ -1,8 +1,7 @@
-import { Modal } from "./Modal";
+import { Modal, Button } from "@/ui";
 import breakdownStyles from "./PriceBreakdownModal.module.css";
-import { formatCurrency } from "../utils/formatCurrency";
-import { Button } from "@/ui/Button";
-import type { PriceParts } from "../utils/calculatePriceWithBreakdown";
+import { formatCurrency } from "@/features/diamond-calculator/utils/formatCurrency";
+import type { PriceParts } from "@/features/diamond-calculator/utils/calculatePriceWithBreakdown";
 
 type Props = {
   open: boolean;
@@ -11,12 +10,7 @@ type Props = {
   final: number;
 };
 
-export default function PriceBreakdownModal({
-  open,
-  onClose,
-  parts,
-  final,
-}: Props) {
+export function PriceBreakdownModal({ open, onClose, parts, final }: Props) {
   const { basePerCarat, base, cutFactor, colorFactor, clarityFactor } = parts;
 
   return (

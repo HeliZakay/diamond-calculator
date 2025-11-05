@@ -9,18 +9,8 @@
   width: min(380px, 100%);
 }
 
-/* Optional media image inside the card */
-.card__image {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: 12px;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
-  margin: 0.5rem 0 0.5rem; /* trim bottom margin to avoid nudging page height */
-}
-
 /* Center the primary action button within the card */
-.card__actions {
+.actions {
   margin-top: 1rem;
   display: flex;
   justify-content: center;
@@ -29,6 +19,13 @@
 /* --- Buttons --- */
 button {
   font-family: inherit;
+}
+
+.viewer {
+  margin: 0.5rem 0 0.75rem;
+  border-radius: 12;
+  overflow: "hidden";
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
 }
 
 /* --- Responsive layout --- */

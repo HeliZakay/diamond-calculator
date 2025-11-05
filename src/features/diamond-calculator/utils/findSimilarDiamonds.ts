@@ -1,5 +1,5 @@
 import type { DiamondInput, Diamond } from "../types";
-import { MOCK_DIAMONDS } from "../data/mockDiamonds";
+import { MOCK_DIAMONDS } from "@/data/mockDiamonds";
 
 // ----------------------------------------------------
 // 🔍 Find Similar Diamonds

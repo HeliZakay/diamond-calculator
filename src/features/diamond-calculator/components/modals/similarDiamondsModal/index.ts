@@ -1,0 +1,1 @@
+export { SimilarDiamondsModal } from "./SimilarDiamondsModal";

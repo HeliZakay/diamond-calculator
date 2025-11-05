@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "./DiamondCanvasPreview.module.css";
-import type { Cut, Color, Clarity } from "../types";
+import type { Cut, Color, Clarity } from "../../types";
 
-// ---- Visual mappings (פשוטים אך נראים טוב) ----
 function sizeFromCarat(carat: number) {
   const c = Math.max(0.1, Math.min(carat, 4));
-  // 260px≈1ct, גדילה עדינה
+
   return Math.round(220 + Math.log2(1 + c) * 120);
 }
 function contrastFromCut(cut: Cut) {
@@ -21,20 +20,20 @@ function contrastFromCut(cut: Cut) {
   }
 }
 function tintFromColor(color: Color) {
-  const idx = ["D", "E", "F", "G", "H", "I", "J"].indexOf(color); // 0..6
-  // Hue בין כחול-קר לניואנס חמים; Saturation עדין
-  const hue = 210 + idx * 6; // 210..246
-  const sat = 4 + idx * 3; // 4%..22%
-  const light = 0; // נשאיר ניטרלי, נטפל בהבהרה בשכבת glare
+  const idx = ["D", "E", "F", "G", "H", "I", "J"].indexOf(color);
+
+  const hue = 210 + idx * 6;
+  const sat = 4 + idx * 3;
+  const light = 0;
   return { hue, sat, light };
 }
 function sparkleFromClarity(clarity: Clarity) {
   const order = ["I1", "SI2", "SI1", "VS2", "VS1", "VVS2", "VVS1", "IF", "FL"];
   const i = order.indexOf(clarity);
   return {
-    count: 3 + Math.round(i * 0.9), // 3..11
-    radius: 10 + i * 1.2, // גודל ניצוץ מקסימלי
-    opacity: 0.15 + i * 0.02, // 0.15..0.33
+    count: 3 + Math.round(i * 0.9),
+    radius: 10 + i * 1.2,
+    opacity: 0.15 + i * 0.02,
   };
 }
 
@@ -43,11 +42,10 @@ type Props = {
   cut: Cut;
   color: Color;
   clarity: Clarity;
-  /** תמונת בסיס של יהלום (PNG עם רקע שקוף או כהה). שימי קובץ טוב ב-public, למשל "/diamond-base.png" */
   src?: string;
 };
 
-export default function DiamondCanvasPreview({
+export function DiamondCanvasPreview({
   carat,
   cut,
   color,
@@ -62,7 +60,6 @@ export default function DiamondCanvasPreview({
   const tint = tintFromColor(color);
   const sparkle = sparkleFromClarity(clarity);
 
-  // טען תמונה
   useEffect(() => {
     const image = new Image();
     image.crossOrigin = "anonymous";
@@ -98,7 +95,6 @@ export default function DiamondCanvasPreview({
     };
   }, [src]);
 
-  // ציור
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -113,7 +109,6 @@ export default function DiamondCanvasPreview({
     if (!ctx) return;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    // רקע עדין (כדי שהטינט והglare “ישבו” יפה)
     ctx.clearRect(0, 0, px, px);
     const bgGrad = ctx.createRadialGradient(
       px * 0.48,
@@ -128,29 +123,25 @@ export default function DiamondCanvasPreview({
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, px, px);
 
-    // צייר תמונת בסיס (אם נטענה), אחרת השאר placeholder חלק
     const pad = Math.round(px * 0.06);
     if (img) {
       ctx.drawImage(img, pad, pad, px - pad * 2, px - pad * 2);
     } else {
-      // Placeholder – פוליגון פשוט כדי שלא יראה ריק בזמן טעינה
       ctx.fillStyle = "#e9edf1";
       roundedDiamond(ctx, px / 2, px / 2, px * 0.38);
       ctx.fill();
     }
 
-    // קונטרסט (לפי CUT) — “curves” פשוט בעזרת globalComposite+filter
     ctx.save();
     ctx.globalCompositeOperation = "multiply";
-    // filter contrast: requires re-draw; ניצור שכבת אפליקציה מלאה
+
     ctx.filter = `contrast(${contrast})`;
     if (img) {
-      ctx.drawImage(canvas, 0, 0); // טריק: הכפל קונטרסט על הבופר הקיים
+      ctx.drawImage(canvas, 0, 0);
     }
     ctx.restore();
     ctx.filter = "none";
 
-    // Tint לפי COLOR (Multiply עדין)
     ctx.save();
     ctx.globalCompositeOperation = "multiply";
     ctx.fillStyle = `hsl(${tint.hue} ${tint.sat}% 50%)`;
@@ -158,7 +149,6 @@ export default function DiamondCanvasPreview({
     ctx.fillRect(0, 0, px, px);
     ctx.restore();
 
-    // Glare highlight עדין (Screen)
     ctx.save();
     ctx.globalCompositeOperation = "screen";
     const glare = ctx.createRadialGradient(
@@ -176,7 +166,6 @@ export default function DiamondCanvasPreview({
     ctx.fillRect(0, 0, px, px);
     ctx.restore();
 
-    // Sparkles לפי CLARITY
     ctx.save();
     ctx.globalAlpha = sparkle.opacity;
     ctx.globalCompositeOperation = "screen";
@@ -189,7 +178,6 @@ export default function DiamondCanvasPreview({
     }
     ctx.restore();
 
-    // מסגרת עדינה
     ctx.strokeStyle = "rgba(255,255,255,0.55)";
     ctx.lineWidth = 1.2;
     ctx.beginPath();
@@ -216,7 +204,6 @@ function roundedDiamond(
   cy: number,
   r: number
 ) {
-  // אוקטגון מעוגל — נראה “יהלומי” קליל
   const k = 0.38;
   const pts = [
     [cx, cy - r],

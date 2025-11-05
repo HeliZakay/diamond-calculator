@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { calculatePriceWithBreakdown } from "../utils/calculatePriceWithBreakdown";
 import { findSimilarDiamonds } from "../utils/findSimilarDiamonds";
 import type { Diamond, PriceParts } from "../types";
-import { useDiamondCalcContext } from "../ contexts/DiamondCalcContext";
+import { useDiamondCalcContext } from "../contexts/DiamondCalcContext";
 
 export function useDiamondComputed(): {
   final: number;

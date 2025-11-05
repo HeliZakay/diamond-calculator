@@ -1,11 +1,10 @@
-import { calculateDiamondPrice } from "../utils/calculateDiamondPrice";
-import { formatCurrency } from "../utils/formatCurrency";
-import { MOCK_DIAMONDS } from "../data/mockDiamonds";
-import { Button } from "@/ui/Button";
-import type { Diamond } from "../types";
+import { calculateDiamondPrice } from "@/features/diamond-calculator/utils/calculateDiamondPrice";
+import { formatCurrency } from "@/features/diamond-calculator/utils/formatCurrency";
+import { MOCK_DIAMONDS } from "@/data/mockDiamonds";
+import { Button, Modal } from "@/ui";
+import type { Diamond } from "@/features/diamond-calculator/types";
 
 import styles from "./SimilarDiamondsModal.module.css";
-import { Modal } from "./Modal";
 
 type Props = {
   open: boolean;
@@ -13,11 +12,7 @@ type Props = {
   diamonds: Diamond[];
 };
 
-export default function SimilarDiamondsModal({
-  open,
-  onClose,
-  diamonds,
-}: Props) {
+export function SimilarDiamondsModal({ open, onClose, diamonds }: Props) {
   const hasDiamonds = diamonds.length > 0;
   const fallbackRecommended = MOCK_DIAMONDS.slice(0, 4);
   const listToRender = hasDiamonds ? diamonds : fallbackRecommended;

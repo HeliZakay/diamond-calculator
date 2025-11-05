@@ -276,12 +276,11 @@ export function DiamondViewer({
   cut,
   clarity,
   texturePath,
-  style,
   className,
 }: DiamondViewerProps) {
   return (
     <div
-      style={{ width: "100%", height: "100%", background: "#eceff3", ...style }}
+      style={{ width: "100%", height: 200, background: "#eceff3" }}
       className={className}
     >
       <Canvas orthographic gl={{ antialias: true }} dpr={[1, 2]}>
