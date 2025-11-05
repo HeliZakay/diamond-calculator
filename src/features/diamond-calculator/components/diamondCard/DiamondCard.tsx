@@ -32,7 +32,6 @@ export function DiamondCard({
   const colorGrade = normalizeColor(color);
   const cutNorm = normalizeCut(cut);
   const clarityNorm = normalizeClarity(clarity);
-
   return (
     <div className={styles.card}>
       <DiamondForm />
