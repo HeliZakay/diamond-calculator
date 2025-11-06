@@ -12,7 +12,7 @@ export function CalculatorHeroSection() {
           <p className={styles["eyebrow"]}>Worthy Pricing Engine</p>
           <h1 className={styles["title"]}>Instant Diamond Valuation</h1>
           <p className={styles["subtitle"]}>
-            Enter the carat, cut, color, and clarity to preview the
+            Enter the carat, cut , color, and clarity to preview the
             automatically generated market price and browse similar inventory.
           </p>
         </div>
