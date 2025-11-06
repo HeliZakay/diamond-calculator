@@ -1,4 +1,5 @@
-import { Modal, Button } from "@/ui";
+import { Button } from "@/ui/button/Button";
+import { Modal } from "@/ui/modal/Modal";
 import breakdownStyles from "./PriceBreakdownModal.module.css";
 import { formatCurrency } from "@/features/diamond-calculator/utils/formatCurrency";
 import type { PriceParts } from "@/features/diamond-calculator/utils/calculateDiamondPrice";
