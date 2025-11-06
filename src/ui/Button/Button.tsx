@@ -1,4 +1,4 @@
-import styles from "./button.module.css";
+import styles from "./Button.module.css";
 
 type ButtonProps = {
   children: React.ReactNode;
