@@ -1,9 +1,7 @@
 import styles from "./CalculatorHeroSection.module.css";
 import { DiamondCalculator } from "@/features/diamond-calculator";
 
-type CalculatorHeroSectionProps = {};
-
-export function CalculatorHeroSection({}: CalculatorHeroSectionProps) {
+export function CalculatorHeroSection() {
   return (
     <header className={styles.hero}>
       <div className={styles["hero__overlay"]} />

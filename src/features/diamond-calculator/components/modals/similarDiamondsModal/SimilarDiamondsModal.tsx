@@ -45,7 +45,7 @@ export function SimilarDiamondsModal({ open, onClose, diamonds }: Props) {
               Color {d.color} • Clarity {d.clarity}
             </p>
             <strong className={styles.price}>
-              {formatCurrency(calculateDiamondPrice(d))}
+              {formatCurrency(calculateDiamondPrice(d).final)}
             </strong>
           </div>
         ))}

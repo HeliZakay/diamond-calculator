@@ -1,7 +1,7 @@
 import type { Cut, Color, Clarity, Factors } from "../types";
 
 // ----------------------------------------------------
-// 💎 Diamond factor tables
+//  Diamond factor tables
 // ----------------------------------------------------
 // These multipliers represent how each characteristic
 // (cut, color, clarity) affects the base price.
@@ -36,8 +36,10 @@ export const CLARITY_FACTORS: Record<Clarity, number> = {
   I1: 0.85,
 };
 
+export const BASE_PRICE_PER_CARAT = 4000;
+
 // ----------------------------------------------------
-// 🧮 Combined export (optional)
+//  Combined export
 // ----------------------------------------------------
 
 export const DIAMOND_FACTORS: Factors = {

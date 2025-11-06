@@ -1,44 +1,36 @@
 import type { Cut, Color, Clarity } from "../types";
-
+import {
+  CUT_FACTORS,
+  COLOR_FACTORS,
+  CLARITY_FACTORS,
+} from "@/features/diamond-calculator/constants/diamondFactors";
 // Ordered from best to lower for color & clarity scales used in UI
-const COLOR_SCALE: Color[] = ["D", "E", "F", "G", "H", "I", "J"]; // 7 steps
-const CLARITY_SCALE: Clarity[] = [
-  "I1",
-  "SI2",
-  "SI1",
-  "VS2",
-  "VS1",
-  "VVS2",
-  "VVS1",
-  "IF",
-  "FL",
-];
+function getNormalized<T extends string | number | symbol>(
+  factors: Record<T, number>,
+  value: T,
+  reverse: boolean = false
+) {
+  const scaleKeys = Object.keys(factors) as T[];
+  const idx = scaleKeys.indexOf(value);
 
-const CUT_MAP: Record<Cut, number> = {
-  Fair: 0.25,
-  Good: 0.5,
-  "Very Good": 0.75,
-  Excellent: 1,
-};
+  if (idx < 0) return 0;
+
+  let normalized_value = idx / (scaleKeys.length - 1);
+  if (reverse) {
+    normalized_value = 1 - normalized_value;
+  }
+
+  return normalized_value;
+}
 
 export function normalizeColor(color: Color): number {
-  const idx = COLOR_SCALE.indexOf(color);
-  if (idx < 0) return 0;
-  return idx / (COLOR_SCALE.length - 1);
+  return getNormalized(COLOR_FACTORS, color);
 }
 
 export function normalizeCut(cut: Cut): number {
-  return CUT_MAP[cut] ?? 0.5;
+  return getNormalized(CUT_FACTORS, cut, true);
 }
 
 export function normalizeClarity(clarity: Clarity): number {
-  const idx = CLARITY_SCALE.indexOf(clarity);
-  if (idx < 0) return 0;
-  return idx / (CLARITY_SCALE.length - 1);
+  return getNormalized(CLARITY_FACTORS, clarity, true);
 }
-
-export const NORMALIZATION = {
-  normalizeColor,
-  normalizeCut,
-  normalizeClarity,
-};

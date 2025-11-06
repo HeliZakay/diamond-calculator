@@ -1,6 +1,5 @@
-// hooks/useDiamondComputed.ts
 import { useMemo } from "react";
-import { calculatePriceWithBreakdown } from "../utils/calculatePriceWithBreakdown";
+import { calculateDiamondPrice } from "../utils/calculateDiamondPrice";
 import { findSimilarDiamonds } from "../utils/findSimilarDiamonds";
 import type { Diamond, PriceParts } from "../types";
 import { useDiamondCalcContext } from "../contexts/DiamondCalcContext";
@@ -14,7 +13,7 @@ export function useDiamondComputed(): {
   const { carat, cut, color, clarity } = ctx;
 
   const { final, parts } = useMemo(
-    () => calculatePriceWithBreakdown({ carat, cut, color, clarity }),
+    () => calculateDiamondPrice({ carat, cut, color, clarity }),
     [carat, cut, color, clarity]
   );
 

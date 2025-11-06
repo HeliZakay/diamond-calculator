@@ -1,7 +1,7 @@
 import { Modal, Button } from "@/ui";
 import breakdownStyles from "./PriceBreakdownModal.module.css";
 import { formatCurrency } from "@/features/diamond-calculator/utils/formatCurrency";
-import type { PriceParts } from "@/features/diamond-calculator/utils/calculatePriceWithBreakdown";
+import type { PriceParts } from "@/features/diamond-calculator/utils/calculateDiamondPrice";
 
 type Props = {
   open: boolean;
