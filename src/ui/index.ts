@@ -1,3 +1,3 @@
-export * from "./button";
-export * from "./modal";
-export * from "./sparkleCursor";
+export * from "./Button";
+export * from "./Modal";
+export * from "./SparkleCursor";

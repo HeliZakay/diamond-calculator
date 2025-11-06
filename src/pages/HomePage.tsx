@@ -1,6 +1,6 @@
 import styles from "./HomePage.module.css";
 import { CalculatorHeroSection } from "../sections/CalculatorHeroSection";
-import { SparkleCursor } from "@/ui/sparkleCursor/SparkleCursor";
+import { SparkleCursor } from "@/ui";
 type HomePageProps = {};
 
 export function HomePage({}: HomePageProps) {

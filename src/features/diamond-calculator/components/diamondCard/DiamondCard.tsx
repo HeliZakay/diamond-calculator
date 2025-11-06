@@ -3,7 +3,7 @@ import {
   PriceBox,
   DiamondViewer,
 } from "@/features/diamond-calculator/components";
-import { Button } from "@/ui/button/Button";
+import { Button } from "@/ui";
 import {
   normalizeColor,
   normalizeCut,

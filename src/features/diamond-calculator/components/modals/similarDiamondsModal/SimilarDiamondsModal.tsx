@@ -1,8 +1,7 @@
 import { calculateDiamondPrice } from "@/features/diamond-calculator/utils/calculateDiamondPrice";
 import { formatCurrency } from "@/features/diamond-calculator/utils/formatCurrency";
 import { MOCK_DIAMONDS } from "@/data/mockDiamonds";
-import { Modal } from "@/ui/modal/Modal";
-import { Button } from "@/ui/button/Button";
+import { Modal, Button } from "@/ui";
 import type { Diamond } from "@/features/diamond-calculator/types";
 
 import styles from "./SimilarDiamondsModal.module.css";
