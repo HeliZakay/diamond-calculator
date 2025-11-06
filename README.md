@@ -35,3 +35,20 @@ This project fulfills and extends the requirements from the **Worthy Frontend Ex
 | **Built with React**                | Modern component patterns and state management best practices.           |
 
 ---
+
+## 💎 Price Calculation & Assumptions
+
+The final diamond price is based on a simple, scalable factor model:
+
+1. We start with a **base price per 1 Carat**.
+2. This base is **multiplied by the selected Carat weight**.
+3. Each quality attribute — **Cut**, **Color**, and **Clarity** — has its own **weighting factor**.
+4. These factors are then **multiplied into the price**, increasing or decreasing it depending on the characteristics chosen.
+
+In short:
+
+> **Final Price = (Base Price × Carat) × CutFactor × ColorFactor × ClarityFactor**
+
+The factor constants are defined in one place, making the pricing model easy to adjust or extend.
+
+---
