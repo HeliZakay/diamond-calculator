@@ -1,73 +1,37 @@
-# React + TypeScript + Vite
+# Diamond Price Calculator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A responsive and polished **React** application that calculates the price of a diamond based on its **Carat**, **Cut**, **Color**, and **Clarity**—and displays similar (or recommended) diamonds with images and prices.
 
-Currently, two official plugins are available:
+This project fulfills and extends the requirements from the **Worthy Frontend Exercise**, demonstrating both algorithmic implementation and UX/UI quality suitable for an investor-facing pricing tool.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🎯 Live Demo
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+➡️ https://diamond-calculator-rho.vercel.app/
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 📝 Features
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Core Requirements (✅ Fully Implemented)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- User inputs **Carat**, **Cut**, **Color**, and **Clarity**
+- Final price is calculated **instantly**
+- A popup lists **similar diamonds** (photo + price)
+- Fully responsive and visually polished for both **desktop and mobile**
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### Extra Features & Improvements (🌟 Advantage Points)
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+| Feature                             | Description                                                              |
+| ----------------------------------- | ------------------------------------------------------------------------ |
+| **Hero Section**                    | Strong first impression and visual framing of the feature.               |
+| **Sparkle Cursor Effect**           | A playful interactive UI flourish enhancing luxury product feel.         |
+| **Price Breakdown Popup**           | Users can view how the final price was calculated factor-by-factor.      |
+| **Dynamic Diamond Preview**         | Visual diamond representation updates based on user selections.          |
+| **Instant Price Updates**           | No "Submit" button required — reacts to input in real-time.              |
+| **Intelligent Similar Items Logic** | If no similar matches exist, recommended alternatives are shown instead. |
+| **Scalable Code Architecture**      | Feature-based folder structure, shared UI components, util helpers.      |
+| **Built with React**                | Modern component patterns and state management best practices.           |
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
