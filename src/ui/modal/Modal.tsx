@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import type { ReactNode } from "react";
 import styles from "./Modal.module.css";
 
@@ -10,90 +11,109 @@ type ModalProps = {
   children: ReactNode;
 };
 
+const getFocusable = (root: HTMLElement) =>
+  Array.from(
+    root.querySelectorAll<HTMLElement>(
+      [
+        "a[href]",
+        "button:not([disabled])",
+        "textarea:not([disabled])",
+        "input:not([disabled])",
+        "select:not([disabled])",
+        '[tabindex]:not([tabindex="-1"])',
+        '[contenteditable="true"]',
+      ].join(",")
+    )
+  ).filter(
+    (el) =>
+      !el.hasAttribute("disabled") &&
+      el.getAttribute("aria-hidden") !== "true" &&
+      el.tabIndex !== -1
+  );
+
 export function Modal({ open, onClose, title, titleId, children }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
-  const lastActiveEl = useRef<HTMLElement | null>(null);
+  const lastActiveElRef = useRef<HTMLElement | null>(null);
+  const autoTitleId = useId();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
-    if (!open) return;
-    // Save last focused element to restore later
-    lastActiveEl.current = document.activeElement as HTMLElement | null;
+    if (!open || !modalRef.current) return;
 
     const node = modalRef.current;
-    if (!node) return;
+    lastActiveElRef.current = document.activeElement as HTMLElement | null;
 
-    // Focus trap helper
-    const getFocusables = () =>
-      Array.from(
-        node.querySelectorAll<HTMLElement>(
-          'a[href], button, textarea, input, select, [tabindex]:not([tabindex="-1"])'
-        )
-      ).filter(
-        (el) => !el.hasAttribute("disabled") && !el.getAttribute("aria-hidden")
-      );
+    // lock scroll
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
 
-    // Move initial focus inside
-    const focusables = getFocusables();
-    const first = focusables[0] ?? node;
-    first.focus({ preventScroll: true });
+    // initial focus
+    (getFocusable(node)[0] ?? node).focus({ preventScroll: true });
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.stopPropagation();
         onClose();
-        return;
-      }
-      if (e.key === "Tab") {
-        const items = getFocusables();
-        if (items.length === 0) {
+      } else if (e.key === "Tab") {
+        const items = getFocusable(node);
+        if (!items.length) {
           e.preventDefault();
           node.focus();
           return;
         }
         const current = document.activeElement as HTMLElement | null;
-        const idx = Math.max(0, items.indexOf(current as HTMLElement));
-        const nextIdx = e.shiftKey
-          ? (idx - 1 + items.length) % items.length
-          : (idx + 1) % items.length;
-        if (!items.includes(current as HTMLElement)) {
-          // If focus somehow escaped, bring it back
-          e.preventDefault();
-          items[0].focus();
-          return;
-        }
-        // Cycle
+        const i = Math.max(0, items.indexOf(current ?? items[0]));
+        const next = e.shiftKey
+          ? (i - 1 + items.length) % items.length
+          : (i + 1) % items.length;
         e.preventDefault();
-        items[nextIdx].focus();
+        items[next].focus();
+      }
+    };
+
+    const onFocusIn = (e: FocusEvent) => {
+      if (e.target instanceof Node && !node.contains(e.target)) {
+        (getFocusable(node)[0] ?? node).focus({ preventScroll: true });
       }
     };
 
     document.addEventListener("keydown", onKeyDown, true);
+    document.addEventListener("focusin", onFocusIn, true);
+
     return () => {
       document.removeEventListener("keydown", onKeyDown, true);
-      // Restore focus to the previously active element
-      lastActiveEl.current?.focus({ preventScroll: true });
+      document.removeEventListener("focusin", onFocusIn, true);
+      document.body.style.overflow = prevOverflow;
+      lastActiveElRef.current?.focus({ preventScroll: true });
     };
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
+  const computedTitleId =
+    typeof title === "string"
+      ? titleId ?? `modal-title-${autoTitleId}`
+      : titleId;
+
+  const content = (
     <div
       className={styles.backdrop}
       role="dialog"
       aria-modal="true"
+      aria-labelledby={title ? computedTitleId : undefined}
       onClick={onClose}
-      aria-labelledby={title ? titleId : undefined}
     >
       <div
-        className={styles.modal}
         ref={modalRef}
+        className={styles.modal}
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
       >
         {title ? (
           typeof title === "string" ? (
-            <h2 id={titleId} className={styles.title}>
+            <h2 id={computedTitleId} className={styles.title}>
               {title}
             </h2>
           ) : (
@@ -103,5 +123,10 @@ export function Modal({ open, onClose, title, titleId, children }: ModalProps) {
         {children}
       </div>
     </div>
+  );
+
+  return createPortal(
+    content,
+    document.getElementById("modal-root") || document.body
   );
 }
